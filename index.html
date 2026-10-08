@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Recomposição do Daniel</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="src/presentation/estilos/base.css">
+  <link rel="stylesheet" href="src/presentation/estilos/componentes.css">
+  <link rel="stylesheet" href="src/presentation/estilos/telas.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="stack-s">
+    <span class="label">Plano de 12 semanas · ganhar músculo e perder gordura</span>
+    <h1>Recomposição do Daniel</h1>
+    <p class="who">21 anos · 72 kg · 1,74 m · trabalho sentado · dias das 8h às 22h</p>
+  </header>
+
+  <div class="keys">
+    <div><b class="num" id="k-bmr">1.738</b><span>kcal de gasto basal (média)</span></div>
+    <div><b class="num" id="k-goal">2.200</b><span>kcal por dia no plano</span></div>
+    <div><b class="num" id="k-prot">144 g</b><span>de proteína por dia</span></div>
+    <div><b class="num">4×</b><span>treinos por semana, ~70 min</span></div>
+  </div>
+
+  <!-- Check-in de hoje: aparece em todas as abas -->
+  <div id="checkin-hoje"></div>
+
+  <nav role="tablist" aria-label="Seções do plano">
+    <button role="tab" data-tab="numeros" aria-selected="true">Números</button>
+    <button role="tab" data-tab="dieta" aria-selected="false">Dieta</button>
+    <button role="tab" data-tab="treino" aria-selected="false">Treino</button>
+    <button role="tab" data-tab="rotina" aria-selected="false">Rotina</button>
+    <button role="tab" data-tab="progresso" aria-selected="false">Progresso</button>
+  </nav>
+
+  <!-- Cada tela é preenchida pelo seu arquivo em src/presentation/telas/ -->
+  <section class="panel" id="tab-numeros"></section>
+  <section class="panel" id="tab-dieta" hidden></section>
+  <section class="panel" id="tab-treino" hidden></section>
+  <section class="panel" id="tab-rotina" hidden></section>
+  <section class="panel" id="tab-progresso" hidden></section>
+</div>
+
+<!--
+  Ordem de carregamento = de dentro para fora.
+  Cada camada só usa o que já foi carregado antes dela.
+-->
+<!-- shared: utilitários sem regra de negócio -->
+<script src="src/shared/datas.js"></script>
+<script src="src/shared/formato.js"></script>
+
+<!-- domain: o plano e as regras (não sabe que existe tela nem navegador) -->
+<script src="src/domain/plano/categorias.js"></script>
+<script src="src/domain/plano/refeicoes.js"></script>
+<script src="src/domain/plano/treinos.js"></script>
+<script src="src/domain/plano/rotina.js"></script>
+<script src="src/domain/regras/calculadora.js"></script>
+<script src="src/domain/regras/cardapio.js"></script>
+<script src="src/domain/regras/progresso.js"></script>
+
+<!-- data: onde as coisas ficam salvas -->
+<script src="src/data/storage.js"></script>
+<script src="src/data/repositorios/checkinRepositorio.js"></script>
+<script src="src/data/repositorios/preferenciasRepositorio.js"></script>
+
+<!-- application: casos de uso (o que o usuário pode fazer) -->
+<script src="src/application/meta.js"></script>
+<script src="src/application/cardapio.js"></script>
+<script src="src/application/treino.js"></script>
+<script src="src/application/checkin.js"></script>
+
+<!-- presentation: telas, componentes e navegação -->
+<script src="src/presentation/componentes/dom.js"></script>
+<script src="src/presentation/componentes/checkin.js"></script>
+<script src="src/presentation/telas/numeros.js"></script>
+<script src="src/presentation/telas/dieta.js"></script>
+<script src="src/presentation/telas/treino.js"></script>
+<script src="src/presentation/telas/rotina.js"></script>
+<script src="src/presentation/telas/progresso.js"></script>
+<script src="src/presentation/navegacao.js"></script>
+
+<!-- main: liga tudo -->
+<script src="src/main.js"></script>
+</body>
+</html>
