@@ -3,12 +3,10 @@ const TelaTreino = {
   montar() {
     $('tab-treino').innerHTML = `
       <div class="stack-s">
-        <h2>Musculação: ABC + corpo inteiro, 4× por semana</h2>
-        <p class="muted">O ABC ocupa as três manhãs da semana e o sábado repete tudo de forma curta, para cada músculo ser estimulado 2× por semana. Cerca de 50 a 55 min de força e 12 a 15 min de cardio no fim.</p>
+        <h2 id="wk-h"></h2>
+        <p class="muted" id="wk-intro"></p>
       </div>
-      <div class="seg" role="group" aria-label="Treino" id="wk-seg">
-        ${CasosTreino.treinos().map((w, i) => `<button data-w="${i}">${w.d} · ${w.k}</button>`).join('')}
-      </div>
+      <div class="seg" role="group" aria-label="Treino" id="wk-seg"></div>
       <div class="card stack">
         <div>
           <h3 id="wk-title"></h3>
@@ -34,12 +32,12 @@ const TelaTreino = {
           </ul>
         </div>
         <div class="card stack-s">
-          <h3>Sobre o cardio de 15 min todo dia</h3>
-          <p>Sua ideia funciona, com um ajuste: nos 4 dias de treino o cardio vai no fim da musculação, em ritmo que ainda dá para conversar (esteira inclinada ou bicicleta). Na terça e na quinta, 15 a 20 min de caminhada rápida no campus entre o trabalho e a aula.</p>
-          <p>Para quem fica sentado o dia inteiro, andar mais ao longo do dia pesa mais que o cardio em si. Meta: 7 a 8 mil passos. O trajeto do ônibus já ajuda.</p>
+          <h3>Cardio sem complicar</h3>
+          <p>Nos dias de treino o cardio vai no fim da musculação, em ritmo que ainda dá para conversar (esteira inclinada ou bicicleta). Nos dias sem treino, 15 a 20 min de caminhada rápida.</p>
+          <p>Para quem fica sentado o dia inteiro, andar mais ao longo do dia pesa mais que o cardio em si. Meta: 7 a 8 mil passos. Ir a pé ou descer um ponto antes do ônibus já ajuda.</p>
         </div>
       </div>
-      <p class="small muted">Sem academia perto de casa? O mesmo esquema funciona em casa com um par de halteres ajustáveis e um banco. Me peça a versão adaptada.</p>`;
+      <p class="small muted">Sem academia perto de casa? O mesmo esquema funciona em casa com um par de halteres ajustáveis e um banco: troque máquinas e polias pela versão com halteres.</p>`;
 
     $('wk-seg').onclick = e => {
       const b = e.target.closest('button');
@@ -60,9 +58,18 @@ const TelaTreino = {
   },
 
   render() {
-    const w = CasosTreino.atual();
-    [...$('wk-seg').children].forEach((b, i) => b.setAttribute('aria-pressed', i === CasosTreino.indice));
-    $('wk-title').textContent = 'Treino ' + w.k + ' (' + w.d + ')';
+    const opcoes = CasosTreino.opcoes(), n = CasosPerfil.atual().diasTreino.length;
+    if (!opcoes.some(o => o.indice === CasosTreino.indice)) CasosTreino.selecionar(opcoes[0].indice);
+    $('wk-h').textContent = n ? `Musculação ${n}× por semana` : 'Musculação: escolha seus dias no Perfil';
+    $('wk-intro').textContent = n <= 2
+      ? 'Com poucos dias, cada treino é de corpo inteiro para estimular todos os músculos. Cerca de 50 a 55 min de força e 12 a 15 min de cardio no fim.'
+      : n === 3
+        ? 'Divisão ABC: peito e ombros, pernas, costas. Cerca de 50 a 55 min de força e 12 a 15 min de cardio no fim.'
+        : 'ABC + um treino de corpo inteiro curto, para cada músculo ser estimulado 2× por semana. Cerca de 50 a 55 min de força e 12 a 15 min de cardio no fim.';
+    $('wk-seg').innerHTML = opcoes.map(o => `<button data-w="${o.indice}" aria-pressed="${o.indice === CasosTreino.indice}">${o.rotulo}</button>`).join('');
+
+    const w = CasosTreino.atual(), dias = CasosTreino.diasDaFicha(CasosTreino.indice);
+    $('wk-title').textContent = 'Treino ' + w.k + (dias ? ' (' + dias + ')' : '');
     $('wk-sub').textContent = w.s;
     $('wk-cardio').textContent = w.c;
     $('wk-body').innerHTML = CasosTreino.exercicios().map(({ id, nome, series, descanso, feito }) => `

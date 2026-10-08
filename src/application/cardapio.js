@@ -3,9 +3,19 @@ const CasosCardapio = {
   escolhas: Preferencias.ler('escolhasCardapio', {}),
   diaDeTreino: Preferencias.ler('diaDeTreino', true),
 
+  // Quanto as porções devem mudar para o cardápio base bater a meta do perfil (diferenças < 3% são ignoradas)
+  fator() {
+    const f = Cardapio.fator(MEALS, CasosMeta.atual().kcal);
+    return Math.abs(f - 1) < 0.03 ? 1 : f;
+  },
+
   refeicoes() {
+    const horas = CasosRotina.horariosRefeicoes(this.diaDeTreino), fator = this.fator();
     return Cardapio.refeicoesDoDia(MEALS, this.diaDeTreino)
-      .map(m => ({ id: m.id, hora: m.t, nome: m.n, opcao: Cardapio.opcao(m, this.escolhas) }));
+      .map(m => {
+        const opcao = Cardapio.opcao(m, this.escolhas);
+        return { id: m.id, hora: horas[m.id], nome: m.n, itens: opcao.i, macros: Cardapio.escalar(opcao.m, fator) };
+      });
   },
 
   trocar(id) {
@@ -19,6 +29,6 @@ const CasosCardapio = {
   },
 
   total() {
-    return Cardapio.total(MEALS, this.escolhas, this.diaDeTreino);
+    return Cardapio.total(MEALS, this.escolhas, this.diaDeTreino, this.fator());
   }
 };

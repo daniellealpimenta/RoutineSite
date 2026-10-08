@@ -10,6 +10,7 @@ const TelaDieta = {
         <button id="d-treino" aria-pressed="true">Dia de treino</button>
         <button id="d-desc" aria-pressed="false">Dia sem treino</button>
       </div>
+      <div class="note small" id="d-porcoes" hidden></div>
       <div class="card" id="meals"></div>
       <div class="total">
         <div class="line"><b>Total do dia</b><b id="t-kcal"></b></div>
@@ -63,11 +64,15 @@ const TelaDieta = {
     const treino = CasosCardapio.diaDeTreino;
     $('d-treino').setAttribute('aria-pressed', treino);
     $('d-desc').setAttribute('aria-pressed', !treino);
-    $('meals').innerHTML = CasosCardapio.refeicoes().map(({ id, hora, nome, opcao }) => `
+    const fator = CasosCardapio.fator(), pct = Math.round((fator - 1) * 20) * 5; // arredonda para 5%
+    $('d-porcoes').hidden = Math.abs(pct) < 5;
+    $('d-porcoes').innerHTML = `<b>Sua meta é ${Math.abs(pct)}% ${pct > 0 ? 'maior' : 'menor'} que o cardápio base.</b> ` +
+      `${pct > 0 ? 'Aumente' : 'Diminua'} as porções (arroz, pão, carnes, frutas) em cerca de ${Math.abs(pct)}%. Os números abaixo já estão ajustados.`;
+    $('meals').innerHTML = CasosCardapio.refeicoes().map(({ id, hora, nome, itens, macros }) => `
       <div class="meal"><time>${hora}</time><div>
         <div class="head"><h3>${nome}</h3><button class="swap" data-m="${id}">Trocar opção</button></div>
-        <ul>${opcao.i.map(x => `<li>${x}</li>`).join('')}</ul>
-        <div class="mac">${opcao.m[0]} kcal · ${opcao.m[1]} g proteína · ${opcao.m[2]} g carbo · ${opcao.m[3]} g gordura</div>
+        <ul>${itens.map(x => `<li>${x}</li>`).join('')}</ul>
+        <div class="mac">${macros[0]} kcal · ${macros[1]} g proteína · ${macros[2]} g carbo · ${macros[3]} g gordura</div>
       </div></div>`).join('');
     this.renderTotal();
   },

@@ -5,7 +5,24 @@ const CasosTreino = {
 
   treinos() { return WK; },
 
-  atual() { return WK[this.indice]; },
+  // Botões da tela: um por dia de treino do perfil ("Seg · A"). Sem dias escolhidos, as 4 fichas.
+  opcoes() {
+    const fichas = CasosRotina.fichas();
+    const dias = DIAS_SEMANA.filter(d => fichas[d.id] != null);
+    if (!dias.length) return WK.map((w, i) => ({ indice: i, rotulo: 'Ficha ' + w.k }));
+    return dias.map(d => ({ indice: fichas[d.id], rotulo: d.curto + ' · ' + WK[fichas[d.id]].k }));
+  },
+
+  // Nomes dos dias em que a ficha cai ("Segunda e quinta")
+  diasDaFicha(i) {
+    const fichas = CasosRotina.fichas();
+    const nomes = DIAS_SEMANA.filter(d => fichas[d.id] === i).map(d => d.nome.toLowerCase());
+    if (!nomes.length) return '';
+    const txt = nomes.length > 1 ? nomes.slice(0, -1).join(', ') + ' e ' + nomes.at(-1) : nomes[0];
+    return txt[0].toUpperCase() + txt.slice(1);
+  },
+
+  atual() { return WK[this.indice] || WK[0]; },
 
   selecionar(i) {
     this.indice = i;
