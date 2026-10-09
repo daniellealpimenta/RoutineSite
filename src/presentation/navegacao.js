@@ -26,6 +26,7 @@ const Navegacao = {
       $('tab-' + b.dataset.tab).hidden = !on;
     });
     Preferencias.salvar('aba', nome);
+    document.body.dataset.aba = nome; // o CSS usa para esconder o chat flutuante na aba Assistente
     const tela = this.telas[nome];
     if (tela.aoMostrar) tela.aoMostrar();
   }

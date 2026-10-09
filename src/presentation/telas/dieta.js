@@ -5,6 +5,7 @@ const TelaDieta = {
       <div class="stack-s">
         <h2>Cardápio do dia</h2>
         <p class="muted">Comida comum, barata e que cabe em marmita. Cada refeição tem duas opções: toque em “trocar” e o total do dia se atualiza.</p>
+        <p class="small origem" id="d-origem"></p>
       </div>
       <div class="seg" role="group" aria-label="Tipo de dia">
         <button id="d-treino" aria-pressed="true">Dia de treino</button>
@@ -60,7 +61,15 @@ const TelaDieta = {
     $('d-desc').onclick = () => { CasosCardapio.definirDiaDeTreino(false); this.render(); };
   },
 
+  renderOrigem() {
+    const data = CasosPlano.geradoEm('dieta');
+    $('d-origem').innerHTML = data
+      ? `Versão gerada pelo assistente em ${fmtDate(parseKey(data)).replace(/\.$/, '')}. <button class="link" data-ir="assistente">Gerar outra ou voltar ao padrão</button>`
+      : `Plano padrão. <button class="link" data-ir="assistente">Pedir uma variação ao assistente</button>`;
+  },
+
   render() {
+    this.renderOrigem();
     const treino = CasosCardapio.diaDeTreino;
     $('d-treino').setAttribute('aria-pressed', treino);
     $('d-desc').setAttribute('aria-pressed', !treino);

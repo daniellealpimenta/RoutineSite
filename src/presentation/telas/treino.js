@@ -5,6 +5,7 @@ const TelaTreino = {
       <div class="stack-s">
         <h2 id="wk-h"></h2>
         <p class="muted" id="wk-intro"></p>
+        <p class="small origem" id="wk-origem"></p>
       </div>
       <div class="seg" role="group" aria-label="Treino" id="wk-seg"></div>
       <div class="card stack">
@@ -57,7 +58,15 @@ const TelaTreino = {
     };
   },
 
+  renderOrigem() {
+    const data = CasosPlano.geradoEm('treino');
+    $('wk-origem').innerHTML = data
+      ? `Versão gerada pelo assistente em ${fmtDate(parseKey(data)).replace(/\.$/, '')}. <button class="link" data-ir="assistente">Gerar outra ou voltar ao padrão</button>`
+      : `Plano padrão. <button class="link" data-ir="assistente">Pedir uma variação ao assistente</button>`;
+  },
+
   render() {
+    this.renderOrigem();
     const opcoes = CasosTreino.opcoes(), n = CasosPerfil.atual().diasTreino.length;
     if (!opcoes.some(o => o.indice === CasosTreino.indice)) CasosTreino.selecionar(opcoes[0].indice);
     $('wk-h').textContent = n ? `Musculação ${n}× por semana` : 'Musculação: escolha seus dias no Perfil';

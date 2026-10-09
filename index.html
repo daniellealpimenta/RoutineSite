@@ -3,6 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <!-- Segurança: só carrega scripts do próprio site (e do Turnstile) e só conversa com o assistente.
+       No GitHub Pages, o workflow troca https://*.workers.dev pelo endereço exato do Worker. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.workers.dev http://127.0.0.1:* http://localhost:*; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
   <title>Seu plano</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="src/presentation/estilos/base.css">
@@ -33,6 +37,7 @@
     <button role="tab" data-tab="treino" aria-selected="false">Treino</button>
     <button role="tab" data-tab="rotina" aria-selected="false">Rotina</button>
     <button role="tab" data-tab="progresso" aria-selected="false">Progresso</button>
+    <button role="tab" data-tab="assistente" aria-selected="false">Assistente</button>
     <button role="tab" data-tab="perfil" aria-selected="false">Perfil</button>
   </nav>
 
@@ -42,6 +47,7 @@
   <section class="panel" id="tab-treino" hidden></section>
   <section class="panel" id="tab-rotina" hidden></section>
   <section class="panel" id="tab-progresso" hidden></section>
+  <section class="panel" id="tab-assistente" hidden></section>
   <section class="panel" id="tab-perfil" hidden></section>
 </div>
 
@@ -49,6 +55,9 @@
   Ordem de carregamento = de dentro para fora.
   Cada camada só usa o que já foi carregado antes dela.
 -->
+<!-- configuração (endereço do assistente) -->
+<script src="src/config.js"></script>
+
 <!-- shared: utilitários sem regra de negócio -->
 <script src="src/shared/datas.js"></script>
 <script src="src/shared/formato.js"></script>
@@ -62,30 +71,37 @@
 <script src="src/domain/regras/cardapio.js"></script>
 <script src="src/domain/regras/progresso.js"></script>
 <script src="src/domain/regras/rotina.js"></script>
+<script src="src/domain/regras/assistente.js"></script>
 
 <!-- data: onde as coisas ficam salvas -->
 <script src="src/data/storage.js"></script>
 <script src="src/data/repositorios/checkinRepositorio.js"></script>
 <script src="src/data/repositorios/preferenciasRepositorio.js"></script>
 <script src="src/data/repositorios/perfilRepositorio.js"></script>
+<script src="src/data/repositorios/planoRepositorio.js"></script>
+<script src="src/data/api/assistenteApi.js"></script>
 
 <!-- application: casos de uso (o que o usuário pode fazer) -->
 <script src="src/application/perfil.js"></script>
 <script src="src/application/meta.js"></script>
 <script src="src/application/rotina.js"></script>
+<script src="src/application/plano.js"></script>
 <script src="src/application/cardapio.js"></script>
 <script src="src/application/treino.js"></script>
 <script src="src/application/checkin.js"></script>
+<script src="src/application/assistente.js"></script>
 
 <!-- presentation: telas, componentes e navegação -->
 <script src="src/presentation/componentes/dom.js"></script>
 <script src="src/presentation/componentes/checkin.js"></script>
 <script src="src/presentation/componentes/cabecalho.js"></script>
+<script src="src/presentation/componentes/conversa.js"></script>
 <script src="src/presentation/telas/numeros.js"></script>
 <script src="src/presentation/telas/dieta.js"></script>
 <script src="src/presentation/telas/treino.js"></script>
 <script src="src/presentation/telas/rotina.js"></script>
 <script src="src/presentation/telas/progresso.js"></script>
+<script src="src/presentation/telas/assistente.js"></script>
 <script src="src/presentation/telas/perfil.js"></script>
 <script src="src/presentation/navegacao.js"></script>
 

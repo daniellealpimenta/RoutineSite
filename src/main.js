@@ -6,17 +6,25 @@ const TELAS = {
   treino: TelaTreino,
   rotina: TelaRotina,
   progresso: TelaProgresso,
+  assistente: TelaAssistente,
   perfil: TelaPerfil
 };
 
-// 1. Cada tela coloca seu HTML na página
+// 1. Cada tela coloca seu HTML na página (e o botão de chat flutuante)
 Object.values(TELAS).forEach(t => t.montar());
+ChatFlutuante.montar();
 
 // 2. Quando um caso de uso muda algo, as telas que dependem dele se redesenham
 CasosPerfil.aoMudar(() => {
   CasosMeta.recalcular();
   Cabecalho.render();
   Object.values(TELAS).forEach(t => t.render());
+});
+CasosPlano.aoMudar(() => {
+  TelaDieta.render();
+  TelaTreino.render();
+  TelaRotina.render();
+  TelaAssistente.render();
 });
 CasosCheckin.aoMudar(() => {
   CheckinHoje.render();

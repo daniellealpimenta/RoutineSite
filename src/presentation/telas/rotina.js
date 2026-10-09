@@ -42,7 +42,7 @@ const TelaRotina = {
     const { dias, grupos } = CasosRotina.semana(), p = CasosPerfil.atual();
 
     $('rt-semana').innerHTML = dias.map(d => {
-      const txt = d.ficha != null ? `${WK[d.ficha].k}: ${WK[d.ficha].s.toLowerCase()}`
+      const txt = d.ficha != null ? `${CasosPlano.fichas()[d.ficha].k}: ${CasosPlano.fichas()[d.ficha].s.toLowerCase()}`
         : d.id === 0 ? 'Descanso e marmitas'
         : d.fds ? 'Descanso ativo'
         : 'Caminhada 15–20 min';

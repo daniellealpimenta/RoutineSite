@@ -56,3 +56,10 @@ textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .swap.perigo{color:var(--warn);border-color:var(--warn)}
 .pre{white-space:pre-line}
 @media(max-width:560px){.form{grid-template-columns:1fr 1fr}}
+
+/* botões de destaque e de texto */
+.swap.primario{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.swap:disabled{opacity:.5;cursor:not-allowed}
+.link{all:unset;cursor:pointer;color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;background:var(--sunken);padding:1px 5px;border-radius:4px}

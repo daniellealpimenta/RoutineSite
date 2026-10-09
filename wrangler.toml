@@ -1,0 +1,29 @@
+# Cloudflare Worker que guarda a chave e repassa os pedidos do assistente.
+# Publicado pelo workflow .github/workflows/assistente.yml (ou: npx wrangler deploy)
+name = "routinesite-assistente"
+main = "api/worker.mjs"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+[vars]
+# Sites que podem usar o assistente (separados por vírgula)
+ORIGENS_PERMITIDAS = "https://daniellealpimenta.github.io,http://localhost:8000,http://127.0.0.1:8000"
+
+# Cotas (pontos: conversa = 1, gerar dieta/treino = 4). Ajuste aqui e faça push.
+LIMITE_GLOBAL_DIA = "600"   # teto diário somando todo mundo: o máximo que a chave pode gastar por dia
+LIMITE_POR_DIA = "60"       # por pessoa (IP e sessão), por dia
+LIMITE_POR_MINUTO = "6"     # pedidos por pessoa, por minuto
+LIMITE_SIMULTANEOS = "2"    # respostas em andamento ao mesmo tempo, por pessoa
+LIMITE_SESSOES_DIA = "20"   # verificações anti-robô (Turnstile) por IP, por dia
+
+# Opcional, anti-robô (Turnstile): TURNSTILE_SITE_KEY e TURNSTILE_SECRET vêm do GitHub
+# (variável e secret), enviados pelo workflow. Veja "Proteção contra abuso" no README.
+
+# Contador de cotas (Durable Object com SQLite, disponível no plano grátis)
+[[durable_objects.bindings]]
+name = "COTAS"
+class_name = "Cotas"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Cotas"]

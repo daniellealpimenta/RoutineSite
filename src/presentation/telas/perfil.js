@@ -8,7 +8,7 @@ const TelaPerfil = {
         <p>Os campos abaixo vêm com valores de exemplo. Troque pelos seus e o plano inteiro se ajusta: metas, porções do cardápio, horários das refeições, dias de treino e rotina. Tudo fica salvo só neste navegador.</p>
       </div>
 
-      <form class="stack" id="pf-form" onsubmit="return false">
+      <form class="stack" id="pf-form">
         <div class="card stack">
           <h2>Você</h2>
           <div class="form">
@@ -76,6 +76,7 @@ const TelaPerfil = {
       </div>`;
 
     const form = $('pf-form');
+    form.onsubmit = e => e.preventDefault();
     form.addEventListener('input', e => {
       const el = e.target;
       if (!el.name || el.value === '') return; // não salva campo vazio no meio da digitação

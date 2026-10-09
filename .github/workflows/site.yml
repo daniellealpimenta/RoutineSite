@@ -1,0 +1,51 @@
+# Publica o site no GitHub Pages a cada push na main.
+# Se a variável ASSISTENTE_URL existir (Settings → Secrets and variables → Actions → Variables),
+# o site publicado passa a usar o assistente hospedado no Cloudflare Worker.
+name: Publicar site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Montar o site
+        env:
+          ASSISTENTE_URL: ${{ vars.ASSISTENTE_URL }}
+        run: |
+          mkdir _site
+          cp -r index.html src _site/
+          if [ -n "$ASSISTENTE_URL" ]; then
+            if ! echo "$ASSISTENTE_URL" | grep -Eq '^https://[A-Za-z0-9.-]+(/[A-Za-z0-9._/-]*)?$'; then
+              echo "::error::ASSISTENTE_URL inválida: use algo como https://routinesite-assistente.SEU-USUARIO.workers.dev"
+              exit 1
+            fi
+            sed -i "s|assistenteUrl: ''|assistenteUrl: '$ASSISTENTE_URL'|" _site/src/config.js
+            grep -q "$ASSISTENTE_URL" _site/src/config.js
+            # CSP: o site publicado só pode conversar com este endereço (e não com localhost)
+            ORIGEM=$(echo "$ASSISTENTE_URL" | grep -Eo '^https://[^/]+')
+            sed -i "s|https://\*\.workers\.dev http://127\.0\.0\.1:\* http://localhost:\*|$ORIGEM|" _site/index.html
+            grep -q "connect-src 'self' $ORIGEM;" _site/index.html
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+      - id: deploy
+        uses: actions/deploy-pages@v4

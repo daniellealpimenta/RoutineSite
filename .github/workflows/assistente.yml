@@ -1,0 +1,56 @@
+# Publica o proxy do assistente (api/worker.mjs) no Cloudflare Workers.
+# Secrets (Settings → Secrets and variables → Actions → Secrets):
+#   CLOUDFLARE_API_TOKEN  token com a permissão "Edit Cloudflare Workers"
+#   CLOUDFLARE_ACCOUNT_ID id da conta Cloudflare
+#   NVIDIA_API_KEY        chave da NVIDIA (vira secret do Worker, nunca aparece no site)
+#   TURNSTILE_SECRET      opcional: chave secreta do Turnstile (anti-robô)
+# Variáveis (… → Variables):
+#   TURNSTILE_SITE_KEY    opcional: chave pública do Turnstile. Com as duas, o Turnstile liga.
+name: Publicar assistente
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'api/**'
+      - 'wrangler.toml'
+      - '.github/workflows/assistente.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: assistente
+  cancel-in-progress: false
+
+env:
+  WRANGLER: '4.20.0'
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    env:
+      TEM_TURNSTILE: ${{ secrets.TURNSTILE_SECRET != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: ${{ env.WRANGLER }}
+          command: deploy --var TURNSTILE_SITE_KEY:${{ vars.TURNSTILE_SITE_KEY }}
+          secrets: |
+            NVIDIA_API_KEY
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+
+      # O secret do Turnstile só é enviado se existir (senão o deploy quebraria com valor vazio)
+      - name: Secret do Turnstile
+        if: env.TEM_TURNSTILE == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
+        run: printf '%s' "$TURNSTILE_SECRET" | npx --yes wrangler@${{ env.WRANGLER }} secret put TURNSTILE_SECRET
