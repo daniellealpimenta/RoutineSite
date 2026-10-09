@@ -66,8 +66,23 @@ const TelaPerfil = {
       </form>
 
       <div class="card stack">
+        <div class="stack-s">
+          <h2>Restrições e preferências</h2>
+          <p class="small muted">Regras que o plano sempre respeita: o assistente leva em conta em toda conversa e ao gerar dieta ou treino. Ele também pode sugerir novas quando você contar algo no chat.</p>
+        </div>
+        <ul class="restricoes" id="pf-restricoes"></ul>
+        <form class="restricao-nova" id="pf-restricao-form">
+          <select id="pf-restricao-area" aria-label="Área">
+            ${Object.entries(AREAS_RESTRICAO).map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}
+          </select>
+          <input id="pf-restricao-texto" type="text" maxlength="150" placeholder="Ex.: Sem remada curvada (lombar), sem lactose…" aria-label="Nova restrição">
+          <button class="swap primario">Adicionar</button>
+        </form>
+      </div>
+
+      <div class="card stack">
         <h2>Seus dados</h2>
-        <p class="small muted">Nada sai deste navegador. Para levar para outro celular ou computador, exporte um backup e importe lá.</p>
+        <p class="small muted">Tudo fica salvo só neste navegador (o assistente recebe seus dados apenas quando você conversa com ele). Para levar para outro celular ou computador, exporte um backup e importe lá.</p>
         <div class="acoes">
           <button class="swap" id="pf-exportar">Exportar backup</button>
           <label class="swap">Importar backup<input type="file" accept="application/json,.json" id="pf-importar" hidden></label>
@@ -88,6 +103,18 @@ const TelaPerfil = {
       if (!b) return;
       const id = +b.dataset.dia, dias = CasosPerfil.atual().diasTreino;
       CasosPerfil.atualizar({ diasTreino: dias.includes(id) ? dias.filter(d => d !== id) : [...dias, id] });
+    };
+
+    $('pf-restricao-form').onsubmit = e => {
+      e.preventDefault();
+      const texto = $('pf-restricao-texto').value.trim();
+      if (!texto) return;
+      CasosPerfil.atualizar({ restricoes: [...CasosPerfil.atual().restricoes, { area: $('pf-restricao-area').value, texto }] });
+      $('pf-restricao-texto').value = '';
+    };
+    $('pf-restricoes').onclick = e => {
+      const b = e.target.closest('[data-remover]');
+      if (b) CasosPerfil.atualizar({ restricoes: CasosPerfil.atual().restricoes.filter((_, i) => i !== +b.dataset.remover) });
     };
 
     $('pf-exportar').onclick = () => {
@@ -122,6 +149,9 @@ const TelaPerfil = {
     [...form.elements].forEach(el => {
       if (el.name && el !== document.activeElement) el.value = p[el.name];
     });
+    $('pf-restricoes').innerHTML = p.restricoes.length
+      ? p.restricoes.map((r, i) => `<li><span class="tag">${AREAS_RESTRICAO[r.area]}</span><span>${esc(r.texto)}</span><button class="fechar" data-remover="${i}" aria-label="Remover restrição: ${esc(r.texto)}">×</button></li>`).join('')
+      : '<li class="small muted vazio">Nenhuma ainda.</li>';
     [...$('pf-dias').children].forEach(b => b.setAttribute('aria-pressed', p.diasTreino.includes(+b.dataset.dia)));
     const n = p.diasTreino.length;
     $('pf-dias-dica').textContent =

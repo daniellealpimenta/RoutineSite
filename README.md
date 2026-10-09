@@ -1,4 +1,10 @@
-# RoutineSite
+<p align="center">
+  <img src="src/presentation/icones/icone.svg" alt="Ícone do RoutineSite: halter com um broto" width="96" height="96">
+</p>
+
+<h1 align="center">RoutineSite</h1>
+
+<p align="center">Plano de 12 semanas · check-in diário · assistente de IA</p>
 
 Um plano de 12 semanas de **dieta, treino e rotina** que se adapta a você, e um gráfico de constância para acompanhar se você está seguindo.
 
@@ -161,12 +167,29 @@ Quer mudar o conteúdo do plano em si? Ele está em arquivos simples de dados:
 
 ## Assistente de IA
 
-O assistente usa o modelo [`nvidia/nemotron-3-ultra-550b-a55b`](https://build.nvidia.com) pela API da NVIDIA, compatível com a da OpenAI. Ele atua como nutricionista esportivo e educador físico, com respostas curtas e em linguagem simples.
+O assistente usa o modelo [`nvidia/nemotron-3-ultra-550b-a55b`](https://build.nvidia.com) pela API da NVIDIA, compatível com a da OpenAI. Ele atua como nutricionista esportivo e educador físico, com jeito de amigo que manja do assunto: casual, direto, com respostas curtas (2 a 4 frases, mais só quando precisa) e os números importantes em **negrito**.
 
+- **Muda o seu plano pela conversa, com a sua aprovação:** conte algo como *"não posso fazer remada curvada, minha lombar dói"*, *"não tomo leite"* ou *"pesei 70,5 kg"*. Ele responde e sugere as mudanças em cartões com **Aplicar** e **Ignorar**. Nada muda sem o seu clique.
 - **Variar a dieta:** pede um cardápio de 7 refeições, com 2 opções cada, na sua meta de calorias e proteína. A resposta vem em JSON, é validada e substitui o cardápio na aba Dieta. Os horários continuam vindo da sua rotina.
 - **Variar o treino:** pede 4 fichas novas (A empurrar, B pernas, C puxar, D corpo inteiro), que entram nos seus dias de treino.
 - **Voltar ao padrão** a qualquer momento, na aba Assistente.
-- **Conversa:** perguntas livres ("o que comer antes do treino?", "troque o almoço por algo sem carne").
+- **Conversa:** perguntas livres ("o que comer antes do treino?", "posso tomar café à noite?").
+
+![Sugestões do assistente aplicadas: troca de exercício e restrição salva](docs/screenshots/sugestoes.png)
+
+**O que ele pode sugerir:**
+
+| Sugestão | Exemplo |
+| --- | --- |
+| Trocar, tirar ou adicionar exercício | Ficha C: trocar "Remada curvada com barra" por "Remada unilateral com haltere" |
+| Trocar uma opção de refeição | Lanche da manhã, opção 2: bebida vegetal, banana e aveia (240 kcal) |
+| Salvar uma restrição | Lembrar sempre (dieta): "Sem leite (lactose)" |
+| Atualizar o perfil (peso, idade, altura, objetivo, atividade) | Perfil, peso: 72 → 70,5 kg (as metas se recalculam) |
+| Gerar dieta ou treino novos | Gerar fichas de treino novas: treino em casa |
+
+**Restrições salvas** ficam na aba Perfil, em *Restrições e preferências*, onde dá para ver, remover e adicionar à mão. Elas entram em toda conversa e em toda geração de dieta ou treino, então você não precisa repetir.
+
+**Como as sugestões são conferidas:** o modelo devolve as mudanças num bloco estruturado, que o site valida contra o plano atual antes de mostrar. A ficha e o exercício precisam existir, os números precisam estar dentro de limites e campos fora da lista são recusados. Qualquer coisa estranha é descartada. Ao clicar em Aplicar, tudo é conferido de novo: se o plano mudou nesse meio-tempo, o cartão avisa em vez de aplicar errado.
 
 **Como o contexto funciona.** O modelo não guarda memória entre chamadas: cada pedido é independente. Por isso o site manda em cada um o seu perfil, as metas, a rotina e o plano atual, mais as últimas 12 mensagens da conversa. O limite de contexto do modelo vale para cada pedido, não para a conversa toda. Mensagens antigas só deixam de ser enviadas e continuam visíveis na tela.
 
@@ -194,7 +217,7 @@ src/
 ├── domain/         o plano e as regras, em funções puras
 │   ├── perfil.js     perfil padrão, objetivos, validação
 │   ├── plano/        dados: refeições, treinos, categorias do check-in
-│   └── regras/       calculadora, cardápio, progresso, rotina, prompts e validação da IA
+│   └── regras/       calculadora, cardápio, progresso, rotina, prompts da IA e ações sugeridas
 ├── data/           localStorage, repositórios e a chamada ao assistente (api/)
 ├── application/    casos de uso: o que o usuário pode fazer
 ├── presentation/   telas, componentes (inclui o chat flutuante), navegação e CSS

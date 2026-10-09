@@ -124,3 +124,28 @@ body[data-aba="dieta"] .chat-painel{bottom:184px;height:min(600px,calc(100vh - 2
 
 /* verificação anti-robô (Turnstile): só aparece quando a Cloudflare pede confirmação */
 .verificacao{position:fixed;left:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:30}
+
+/* sugestões de mudança do assistente */
+.sugestoes-ia{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.sugestao{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--line);font-size:.88rem}
+.sugestao-txt{flex:1 1 200px;min-width:0}
+.sugestao-botoes{display:flex;gap:6px}
+.sugestao-botoes .swap{padding:4px 12px}
+.sugestao-estado{font-size:.8rem;font-weight:600;color:var(--muted)}
+.sugestao.aplicada{border-color:var(--accent);background:var(--accent-soft)}
+.sugestao.aplicada .sugestao-estado{color:var(--accent)}
+.sugestao.ignorada{opacity:.6}
+.sugestao.erro .sugestao-estado{color:var(--warn)}
+.sugestoes-ia .link{align-self:flex-start;font-size:.85rem}
+
+/* perfil: restrições */
+.restricoes{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.restricoes li{display:flex;align-items:center;gap:10px;padding:6px 6px 6px 10px;border-radius:10px;background:var(--sunken)}
+.restricoes li>span:nth-child(2){flex:1;min-width:0}
+.restricoes .vazio{background:none;padding:0}
+.restricoes .fechar{width:28px;height:28px;font-size:1.2rem}
+.tag{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:999px;white-space:nowrap}
+.restricao-nova{display:flex;gap:8px;flex-wrap:wrap}
+.restricao-nova select{width:auto;flex:0 0 auto}
+.restricao-nova input{flex:1 1 220px}

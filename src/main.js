@@ -26,6 +26,7 @@ CasosPlano.aoMudar(() => {
   TelaRotina.render();
   TelaAssistente.render();
 });
+CasosAssistente.aoMudar(() => Conversa.render()); // sugestões aplicadas/ignoradas
 CasosCheckin.aoMudar(() => {
   CheckinHoje.render();
   TelaProgresso.render();

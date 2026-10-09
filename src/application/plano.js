@@ -26,6 +26,21 @@ const CasosPlano = {
     this.avisar();
   },
 
+  // Edição pontual feita por uma ação do assistente (troca de exercício, de refeição...).
+  // Diferente de definir*, não zera tudo: só as marcações da ficha que mudou.
+  editarTreino(fichas, letraMudada) {
+    const indice = fichas.findIndex(w => w.k === letraMudada);
+    Object.keys(CasosTreino.feitos).filter(k => k.startsWith(indice + '-')).forEach(k => delete CasosTreino.feitos[k]);
+    Preferencias.salvar('exerciciosFeitos', CasosTreino.feitos);
+    this.plano = { ...this.plano, treino: { fichas, geradoEm: this.plano.treino?.geradoEm || dateKey(today()) } };
+    this.avisar();
+  },
+
+  editarDieta(refeicoes) {
+    this.plano = { ...this.plano, dieta: { refeicoes, geradoEm: this.plano.dieta?.geradoEm || dateKey(today()) } };
+    this.avisar();
+  },
+
   restaurar(tipo) {
     this.plano = { ...this.plano, [tipo]: null };
     if (tipo === 'dieta') { CasosCardapio.escolhas = {}; Preferencias.salvar('escolhasCardapio', {}); }

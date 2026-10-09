@@ -32,30 +32,61 @@ const Conversa = {
       const b = e.target.closest('button');
       if (b) { texto.value = b.textContent; this.enviar(texto); }
     };
+    // botões das sugestões de mudança (Aplicar / Ignorar / Aplicar todas)
+    raiz.querySelector('.c-msgs').onclick = e => {
+      const b = e.target.closest('button[data-acao-fazer]');
+      if (!b) return;
+      const msg = +b.dataset.msg, acao = +b.dataset.acao;
+      if (b.dataset.acaoFazer === 'aplicar') CasosAssistente.aplicar(msg, acao);
+      else if (b.dataset.acaoFazer === 'ignorar') CasosAssistente.ignorar(msg, acao);
+      else CasosAssistente.aplicarTodas(msg);
+    };
     this.raizes.push(raiz);
   },
 
-  bolha(role, conteudo) {
-    return role === 'user'
-      ? `<div class="msg eu">${esc(conteudo)}</div>`
-      : `<div class="msg ia">${markdownSimples(conteudo)}</div>`;
+  bolha(role, conteudo, acoes, iMsg) {
+    if (role === 'user') return `<div class="msg eu">${esc(conteudo)}</div>`;
+    return `<div class="msg ia">${markdownSimples(conteudo)}${acoes?.length ? this.cartoes(acoes, iMsg) : ''}</div>`;
+  },
+
+  // Sugestões de mudança no plano: cada uma com Aplicar/Ignorar, ou o resultado
+  cartoes(acoes, iMsg) {
+    const ESTADOS = { aplicada: '✓ Aplicada', ignorada: 'Ignorada', aplicando: 'Aplicando…' };
+    const pendentes = acoes.filter(a => a.estado === 'pendente').length;
+    return `<div class="sugestoes-ia">
+      ${acoes.map((a, i) => `
+        <div class="sugestao ${a.estado}">
+          <span class="sugestao-txt">${esc(a.descricao)}</span>
+          ${a.estado === 'pendente' ? `
+            <span class="sugestao-botoes">
+              <button class="swap primario" data-acao-fazer="aplicar" data-msg="${iMsg}" data-acao="${i}">Aplicar</button>
+              <button class="swap" data-acao-fazer="ignorar" data-msg="${iMsg}" data-acao="${i}">Ignorar</button>
+            </span>`
+          : `<span class="sugestao-estado">${a.estado === 'erro' ? 'Não deu: ' + esc(a.erro || 'erro') : ESTADOS[a.estado]}</span>`}
+        </div>`).join('')}
+      ${pendentes > 1 ? `<button class="link" data-acao-fazer="todas" data-msg="${iMsg}">Aplicar todas (${pendentes})</button>` : ''}
+    </div>`;
   },
 
   render() {
     const ativo = CasosAssistente.ativo, msgs = CasosAssistente.mensagens;
-    const html = msgs.map(m => this.bolha(m.role, m.content));
+    const html = msgs.map((m, i) => this.bolha(m.role, m.content, m.acoes, i));
     if (this.pendente) html.push(this.pendente);
     const conteudo = html.length ? html.join('')
       : '<p class="small muted vazio">Nenhuma mensagem ainda. Escolha uma sugestão ou escreva sua pergunta.</p>';
     this.raizes.forEach(r => {
       r.querySelector('.c-offline').hidden = ativo;
       const lista = r.querySelector('.c-msgs');
+      // só desce até o fim se chegou mensagem nova ou se já estava lá embaixo
+      const noFim = lista.scrollHeight - lista.scrollTop - lista.clientHeight < 80;
+      const topo = lista.scrollTop;
       lista.innerHTML = conteudo;
-      lista.scrollTop = lista.scrollHeight;
+      lista.scrollTop = noFim || html.length !== this.totalAnterior ? lista.scrollHeight : topo;
       r.querySelector('.c-sugestoes').hidden = msgs.length > 0 || !ativo;
       r.querySelectorAll('.c-enviar, .c-sugestoes button').forEach(b => { b.disabled = this.ocupado || !ativo; });
       r.querySelector('.c-texto').disabled = !ativo;
     });
+    this.totalAnterior = html.length;
   },
 
   limpar() {

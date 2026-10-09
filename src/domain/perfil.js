@@ -14,7 +14,8 @@ const PERFIL_PADRAO = {
   fimAtividades: '22:00',
   diasTreino: [1, 3, 5, 6],  // Date.getDay(): 0 = domingo
   horarioTreino: 'antes',    // 'antes' ou 'depois' das atividades (fim de semana é sempre de manhã)
-  sobreRotina: ''            // texto livre: deslocamentos, turnos, restrições...
+  sobreRotina: '',           // texto livre: deslocamentos, turnos, restrições...
+  restricoes: []             // [{ area: 'treino'|'dieta'|'geral', texto }]: regras que o plano sempre respeita
 };
 
 // ajuste = quanto a meta de calorias muda em relação ao gasto total do dia
@@ -45,6 +46,10 @@ const Perfil = {
     if (n.horarioTreino !== 'depois') n.horarioTreino = 'antes';
     n.diasTreino = Array.isArray(n.diasTreino) ? [...new Set(n.diasTreino.map(Number).filter(d => d >= 0 && d <= 6))] : [];
     n.nome = String(n.nome || '').trim().slice(0, 40);
+    n.restricoes = (Array.isArray(n.restricoes) ? n.restricoes : [])
+      .filter(r => r && typeof r.texto === 'string' && r.texto.trim())
+      .map(r => ({ area: ['treino', 'dieta', 'geral'].includes(r.area) ? r.area : 'geral', texto: r.texto.replace(/[<>]/g, '').trim().slice(0, 150) }))
+      .slice(0, 20);
     return n;
   }
 };
