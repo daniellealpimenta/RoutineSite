@@ -14,8 +14,9 @@ const Conversa = {
 
   montar(raiz) {
     raiz.innerHTML = `
-      <div class="c-offline note small" hidden>
-        O assistente está desligado. Rode <code>node server.js</code> ou configure o Worker (veja o README).
+      <div class="c-offline note small stack-s" hidden>
+        <p>Não consegui falar com o assistente. Pode ser a conexão, um bloqueador de anúncios ou o servidor fora do ar.</p>
+        <div><button type="button" class="swap c-reconectar">Tentar de novo</button></div>
       </div>
       <div class="chat-msgs c-msgs" aria-live="polite"></div>
       <div class="seg c-sugestoes">${SUGESTOES.map(s => `<button type="button">${esc(s)}</button>`).join('')}</div>
@@ -24,6 +25,11 @@ const Conversa = {
         <button class="swap primario c-enviar">Enviar</button>
       </form>`;
     const texto = raiz.querySelector('.c-texto');
+    raiz.querySelector('.c-reconectar').onclick = async e => {
+      e.target.disabled = true; e.target.textContent = 'Conectando…';
+      await CasosAssistente.verificar();
+      e.target.disabled = false; e.target.textContent = 'Tentar de novo';
+    };
     raiz.querySelector('.c-form').onsubmit = e => { e.preventDefault(); this.enviar(texto); };
     texto.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.enviar(texto); }
@@ -160,6 +166,7 @@ const ChatFlutuante = {
     $('cf-botao').setAttribute('aria-expanded', abrir);
     document.body.classList.toggle('chat-aberto', abrir);
     if (abrir) {
+      if (!CasosAssistente.ativo) CasosAssistente.verificar(); // a checagem do carregamento pode ter falhado
       Conversa.render();
       const campo = $('cf-painel').querySelector('.c-texto');
       if (!campo.disabled) campo.focus();

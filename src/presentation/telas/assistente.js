@@ -48,7 +48,7 @@ const TelaAssistente = {
       if (r) CasosPlano.restaurar(r.dataset.restaurar);
     };
 
-    CasosAssistente.verificar().then(() => { this.render(); Conversa.render(); });
+    CasosAssistente.verificar(); // ao terminar, avisa os ouvintes (main.js redesenha)
   },
 
   render() {

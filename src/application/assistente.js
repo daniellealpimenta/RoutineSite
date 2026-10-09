@@ -7,9 +7,12 @@ const CasosAssistente = {
   HISTORICO: 12, // quantas mensagens anteriores vão em cada pedido (o modelo não lembra sozinho)
   ativo: false,
 
+  // Confere se o servidor do assistente está no ar. Pedidos repetidos ao mesmo tempo viram um só.
   async verificar() {
-    this.ativo = await AssistenteApi.disponivel();
-    return this.ativo;
+    this.verificando ||= AssistenteApi.disponivel()
+      .then(ativo => { this.ativo = ativo; this.ouvintes.forEach(fn => fn()); return ativo; })
+      .finally(() => { this.verificando = null; });
+    return this.verificando;
   },
 
   aoMudar(fn) { this.ouvintes.push(fn); },

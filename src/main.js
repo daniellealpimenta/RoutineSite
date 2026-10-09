@@ -26,7 +26,7 @@ CasosPlano.aoMudar(() => {
   TelaRotina.render();
   TelaAssistente.render();
 });
-CasosAssistente.aoMudar(() => Conversa.render()); // sugestões aplicadas/ignoradas
+CasosAssistente.aoMudar(() => { Conversa.render(); TelaAssistente.render(); }); // conexão, sugestões aplicadas/ignoradas
 Verificacao.aoMudar(() => Conversa.render()); // Cloudflare pedindo o clique anti-robô
 CasosCheckin.aoMudar(() => {
   CheckinHoje.render();

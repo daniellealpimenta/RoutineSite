@@ -44,6 +44,11 @@ jobs:
             sed -i "s|https://\*\.workers\.dev http://127\.0\.0\.1:\* http://localhost:\*|$ORIGEM|" _site/index.html
             grep -q "connect-src 'self' $ORIGEM;" _site/index.html
           fi
+          # Cada deploy muda o endereço dos scripts e estilos (?v=commit): o navegador
+          # não reaproveita a versão antiga do cache (o GitHub Pages guarda por 10 min)
+          V=${GITHUB_SHA::8}
+          sed -i -E "s#(src|href)=\"(src/[^\"?]+\.(js|css|svg|png))\"#\1=\"\2?v=$V\"#g" _site/index.html
+          grep -q "src/config.js?v=$V" _site/index.html
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
