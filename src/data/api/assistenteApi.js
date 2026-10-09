@@ -108,6 +108,12 @@ const Verificacao = {
   script: null,
   widget: null,
   pendente: null,
+  interativo: false, // true enquanto a Cloudflare espera a pessoa clicar no quadradinho
+  ouvintes: [],
+  TEMPO_MAXIMO: 120_000,
+
+  aoMudar(fn) { this.ouvintes.push(fn); },
+  marcar(interativo) { this.interativo = interativo; this.ouvintes.forEach(fn => fn()); },
 
   carregar() {
     this.script ||= new Promise((ok, erro) => {
@@ -121,10 +127,25 @@ const Verificacao = {
     return this.script;
   },
 
+  // Resolve (ou rejeita) a verificação em andamento e limpa o estado
+  terminar(token, erro) {
+    const p = this.pendente;
+    this.pendente = null;
+    if (!p) return;
+    clearTimeout(p.relogio);
+    if (this.interativo) this.marcar(false);
+    if (erro) p.erro(erro); else p.ok(token);
+  },
+
   async token(siteKey) {
     const ts = await this.carregar();
     return new Promise((ok, erro) => {
-      this.pendente = { ok, erro };
+      // sem resposta em 2 min (ninguém clicou, rede caiu...): desiste em vez de ficar esperando para sempre
+      const relogio = setTimeout(() => {
+        this.terminar(null, new Error('A verificação anti-robô não foi concluída. Tente enviar de novo.'));
+        ts.reset(this.widget);
+      }, this.TEMPO_MAXIMO);
+      this.pendente = { ok, erro, relogio };
       if (this.widget === null) {
         const caixa = document.createElement('div');
         caixa.className = 'verificacao';
@@ -132,9 +153,11 @@ const Verificacao = {
         this.widget = ts.render(caixa, {
           sitekey: siteKey,
           appearance: 'interaction-only',
-          callback: t => { this.pendente?.ok(t); this.pendente = null; },
-          'error-callback': () => { this.pendente?.erro(new Error('A verificação anti-robô falhou. Recarregue a página.')); this.pendente = null; },
-          'expired-callback': () => ts.reset(this.widget)
+          callback: t => this.terminar(t),
+          'error-callback': () => { this.terminar(null, new Error('A verificação anti-robô falhou. Recarregue a página e tente de novo.')); return true; },
+          'expired-callback': () => ts.reset(this.widget),
+          'before-interactive-callback': () => this.marcar(true),
+          'after-interactive-callback': () => this.marcar(false)
         });
       } else {
         ts.reset(this.widget); // um token por verificação: pede outro

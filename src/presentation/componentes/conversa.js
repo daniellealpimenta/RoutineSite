@@ -71,7 +71,12 @@ const Conversa = {
   render() {
     const ativo = CasosAssistente.ativo, msgs = CasosAssistente.mensagens;
     const html = msgs.map((m, i) => this.bolha(m.role, m.content, m.acoes, i));
-    if (this.pendente) html.push(this.pendente);
+    if (this.pendente) {
+      // a Cloudflare pediu confirmação: avisa onde clicar em vez de só "Escrevendo…"
+      html.push(Verificacao.interativo && this.ocupado
+        ? '<div class="msg ia aviso-verificacao"><p>Antes de responder, confirme que você não é um robô: é só marcar o quadradinho <b>"Verify you are human"</b> no canto inferior esquerdo da tela.</p></div>'
+        : this.pendente);
+    }
     const conteudo = html.length ? html.join('')
       : '<p class="small muted vazio">Nenhuma mensagem ainda. Escolha uma sugestão ou escreva sua pergunta.</p>';
     this.raizes.forEach(r => {

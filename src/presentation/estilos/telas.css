@@ -149,3 +149,6 @@ body[data-aba="dieta"] .chat-painel{bottom:184px;height:min(600px,calc(100vh - 2
 .restricao-nova{display:flex;gap:8px;flex-wrap:wrap}
 .restricao-nova select{width:auto;flex:0 0 auto}
 .restricao-nova input{flex:1 1 220px}
+.msg.aviso-verificacao{background:var(--warn-soft);color:var(--fg)}
+/* acima do painel de chat, inclusive no celular em tela cheia */
+.verificacao{z-index:40}
