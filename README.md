@@ -91,6 +91,7 @@ node server.js
 
 Sem o servidor, a aba Assistente mostra como ligá-lo e o resto do site funciona igual.
 
+<!--
 ## Publicar (GitHub Pages + Cloudflare Worker)
 
 O GitHub Actions não mantém servidores no ar: ele só roda tarefas que começam e terminam. Por isso a publicação tem duas partes, e o Actions cuida das duas a cada `git push`:
@@ -143,6 +144,7 @@ Os limites ficam no [`wrangler.toml`](wrangler.toml) (`LIMITE_*`): mude e faça 
 - **Cota de pedidos do Cloudflare.** No plano grátis, todo pedido ao Worker conta nos 100 mil/dia, inclusive os recusados. Um ataque grande pode esgotar essa cota, mas **no plano grátis isso não gera cobrança**: o Worker só para de responder até a meia-noite UTC, e o resto do site (GitHub Pages) continua no ar. Não mude para o plano pago sem configurar alertas de uso (*Notifications → Usage-based billing*).
 - **Robôs com muitos IPs resolvendo captchas.** O teto global limita o estrago a 600 pontos/dia: no pior caso, o assistente fica indisponível até o dia seguinte.
 - Para barrar ataques antes de chegarem ao Worker (sem contar na cota), dá para usar um domínio próprio na Cloudflare com uma regra de **WAF Rate Limiting** (o plano grátis inclui 1 regra).
+-->
 
 ## Personalização
 
