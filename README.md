@@ -2,7 +2,7 @@
   <img src="src/presentation/icones/icone.svg" alt="Ícone do RoutineSite: halter com um broto" width="96" height="96">
 </p>
 
-<h1 align="center">RoutineSite</h1>
+<h1 align="center"><a href="https://daniellealpimenta.github.io/RoutineSite/">RoutineSite</a></h1>
 
 <p align="center">Plano de 12 semanas · check-in diário · assistente de IA</p>
 
